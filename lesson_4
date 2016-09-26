@@ -1,0 +1,142 @@
+def prompt(message)
+  puts "=> #{message}"
+end
+
+# Initialize Deck
+def initialize_deck
+  hearts_arr = ["2", "3", "4", "5", "6", "7", "8",
+                "9", "10", "J", "Q", "K", "A"]
+  new_heart_arr = hearts_arr.product(["H"])
+
+  spades_arr = ["2", "3", "4", "5", "6", "7", "8",
+                "9", "10", "J", "Q", "K", "A"]
+  new_spade_arr = spades_arr.product(["S"])
+
+  clubs_arr = ["2", "3", "4", "5", "6", "7", "8",
+               "9", "10", "J", "Q", "K", "A"]
+  new_club_arr = clubs_arr.product(["C"])
+
+  diamonds_arr = ["2", "3", "4", "5", "6", "7", "8",
+                  "9", "10", "J", "Q", "K", "A"]
+  new_diamond_arr = diamonds_arr.product(["D"])
+  new_deck = new_heart_arr + new_spade_arr + new_club_arr + new_diamond_arr
+  new_deck
+end
+
+# Method to deal cards to player and computer
+def deal(cards)
+  plyr_card_1 = cards.sample
+  plyr_card_2 = cards.sample
+  com_card_1 = cards.sample
+  com_card_2 = cards.sample
+end
+
+# Method to take a hit
+def hit(deck, cards)
+  hit_card = deck.sample
+  new_cards = cards.push(hit_card)
+  new_cards
+end
+
+# Method to check if players have busted
+def busted?(card)
+  card > 21
+end
+
+# Method to add up value of total cards dealt
+def total(cards)
+  # cards = [['H', '3'], ['S', 'Q'], ... ]
+  values = cards.map { |card| card[0] }
+
+  sum = 0
+  values.each do |value|
+    if value == "A"
+      sum += 11
+    elsif value.to_i == 0 # J, Q, K
+      sum += 10
+    else
+      sum += value.to_i
+    end
+  end
+
+  # correct for Aces
+  values.select { |value| value == "A" }.count.times do
+    sum -= 10 if sum > 21
+  end
+
+  sum
+end
+
+def winner(player, computer)
+  if player > computer && player < 22
+    prompt("Player Wins!")
+  elsif computer > player && computer < 22
+    prompt('Computer Wins!')
+  else
+    prompt("It's a Tie!")
+  end  
+end
+
+loop do #main loop
+#Start of the program
+deck = initialize_deck
+# Deal cards to player and computer
+plyr_card_1 = deal(deck)
+plyr_card_2 = deal(deck)
+com_card_1 = deal(deck)
+com_card_2 = deal(deck)
+# Place dealt player cards in an Array
+player_cards = [plyr_card_1, plyr_card_2]
+computer_cards = [com_card_1, com_card_2]
+
+prompt("You were dealt #{plyr_card_1} and #{plyr_card_2}")
+prompt("Computer is showing #{com_card_1}")
+
+#Players turn looping condition based on hit or stay
+answer = nil
+total_cards = nil
+loop do
+  prompt('hit or stay?')
+  answer = gets.chomp
+  if answer == 'hit'
+  p cards_with_hits = hit(deck, player_cards)
+  p total_cards = total(cards_with_hits)
+  elsif answer == 'stay'
+  p total_cards = total(player_cards)
+  end  
+  break if answer == 'stay' || busted?(total_cards)   # the busted? method is not shown
+end
+
+if busted?(total_cards)
+  prompt("You Busted the 'Computer Wins'")
+  exit
+else
+  prompt("You chose to stay at '#{total_cards}'!")  # if player didn't bust, must have stayed to get here
+end
+
+#Computer turn looping condition
+computer_total_cards = total(computer_cards)
+prompt("Dealer's Turn")
+prompt(computer_cards)
+until computer_total_cards >= 17
+  p cards_with_hits = hit(deck, computer_cards)
+  p computer_total_cards = total(cards_with_hits)
+end
+
+if busted?(computer_total_cards)
+  prompt("Computer 'BUSTED' you 'WON THE GAME!'")
+  exit
+else
+  prompt('You chose to stay!')  
+end 
+
+prompt("Computer is at #{computer_total_cards}")
+
+winner(total_cards, computer_total_cards)
+
+prompt('Play again? (y or n)')
+  end_game_answer = gets.chomp
+  break unless end_game_answer.downcase.start_with?('y')
+end
+
+prompt('Thanks for playing 21! Good Bye!')
